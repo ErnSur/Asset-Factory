@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="listview-item" style="height: 30px;&#10;flex-direction: row;&#10;align-items: center;&#10;">
+        <Style src="AssetFactory-item.uss" />
+        <ui:VisualElement name="icon" style="width: 30px;&#10;-unity-background-scale-mode: scale-to-fit;&#10;height: 100%;&#10;margin-left: 5px;&#10;margin-right: 5px;&#10;" />
+        <ui:Label text="Label" />
+    </ui:VisualElement>
+</ui:UXML>
