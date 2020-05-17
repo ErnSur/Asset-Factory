@@ -20,12 +20,12 @@ namespace QuickEye.Scaffolding
         //}
     }
 
-    public class AssetFactoryController
+    public class AssetFactoryDataSource
     {
         private const string _createMenuPath = "Assets/Create/";
         private string NewItemWindowPath => AssetFactoryWindow.ContextMenuPath;
 
-        public List<CreateAssetStrategy> GetCreateActions()
+        public List<CreateAssetStrategy> GetCreateStrategies()
         {
             var shortcuts = TypeCache.GetMethodsWithAttribute<ShortcutAttribute>();
             var menuItems = TypeCache.GetMethodsWithAttribute<MenuItem>();

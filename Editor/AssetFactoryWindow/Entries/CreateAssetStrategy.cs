@@ -2,12 +2,9 @@
 using System.IO;
 using System.Reflection;
 using UnityEditor;
-using UnityEditor.Presets;
 using UnityEditor.ProjectWindowCallback;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.XR;
 
 namespace QuickEye.Scaffolding
 {
@@ -59,6 +56,7 @@ namespace QuickEye.Scaffolding
         {
             _addHandler?.Invoke(path);
         }
+        public override string ToString() => MenuPath;
     }
 
     //Base Asset Entries
@@ -120,12 +118,11 @@ namespace QuickEye.Scaffolding
         public static CreateAssetStrategy CreateEntry() => new CreateMaterialAssetEntry();
 
         public override Texture2D Icon => EditorGUIUtility.IconContent("Material Icon").image as Texture2D;
-
-        public CreateMaterialAssetEntry() : base("Material") { }
+        public CreateMaterialAssetEntry() : base("Material") { FileExtension = ".mat"; }
 
         public override void Execute(string path)
         {
-            path += ".mat";
+            path = Path.ChangeExtension(path, FileExtension);
             var defaultMat = _defaultMaterial;
 
             var rp = GraphicsSettings.currentRenderPipeline;
@@ -142,6 +139,28 @@ namespace QuickEye.Scaffolding
             //The fact that this is internal makes me cry
             var methodInfo = typeof(Material).GetMethod("GetDefaultMaterial", BindingFlags.Static | BindingFlags.NonPublic);
             return methodInfo.Invoke(null, null) as Material;
+        }
+    }
+
+    public class CreateScriptAssetEntry : CreateAssetStrategy<MonoScript>
+    {
+        [CreateAssetEntry]
+        public static CreateAssetStrategy CreateEntry() => new CreateScriptAssetEntry();
+        public override Texture2D Icon => EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D;
+        public CreateScriptAssetEntry() : base("Script/C# Script") { FileExtension = ".cs"; }
+        public override void Execute(string path)
+        {
+            path = Path.ChangeExtension(path, FileExtension);
+
+            var basePath = Path.Combine(EditorApplication.applicationContentsPath, "Resources/ScriptTemplates");
+            var templatePath = Path.Combine(basePath, "81-C# Script-NewBehaviourScript.cs.txt");
+            CreateScriptAssetFromTemplate(path, templatePath);
+        }
+
+        private static UnityEngine.Object CreateScriptAssetFromTemplate(string path, string templatePath)
+        {
+            var methodInfo = typeof(ProjectWindowUtil).GetMethod("CreateScriptAssetFromTemplate", BindingFlags.Static | BindingFlags.NonPublic);
+            return methodInfo.Invoke(null, new[] { path, templatePath }) as UnityEngine.Object;
         }
     }
 }

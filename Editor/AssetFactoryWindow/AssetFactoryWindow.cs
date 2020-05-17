@@ -18,8 +18,6 @@ namespace QuickEye.Scaffolding
         private const string _uxmlPath = "QuickEye/AssetFactory/AssetFactory";
         private const string _listItemUxmlPath = _uxmlPath + "-item";
 
-        public static Rect LastPosition { get; private set; }
-
 #if UNITY_2019_1_OR_NEWER
         [Shortcut(ContextMenuPath, KeyCode.X, ShortcutModifiers.Action | ShortcutModifiers.Shift)]
 #endif
@@ -35,53 +33,49 @@ namespace QuickEye.Scaffolding
             wnd.Show();
         }
 
-        private static GUIContent CreateWindowTitle()
+        private static GUIContent CreateWindowTitle() => new GUIContent
         {
-            var name = "New item...";
-            var icon = EditorGUIUtility.IconContent("Project").image;
-            return new GUIContent(name, icon);
-        }
-
-        private AssetFactoryController _controller = new AssetFactoryController();
+            text = "New item...",
+            image = EditorGUIUtility.IconContent("Project").image
+        };
+        
+        private AssetFactoryDataSource _dataSource = new AssetFactoryDataSource();
 
         private List<CreateAssetStrategy> _itemEntries;
 
         #region VisualElements
-        [UQuery("details")]
+        [Q("details")]
         private VisualElement _details;
 
-        [UQuery("entry-list")]
+        [Q("entry-list")]
         private ListView _entryListView;
 
-        [UQuery("category-list")]
+        [Q("category-list")]
         private ListView _categoryListView;
 
-        [UQuery("description")]
+        [Q("description")]
         private Label _description;
 
-        [UQuery("type-label")]
+        [Q("type-label")]
         private Label _typeName;
 
-        [UQuery]
-        private ToolbarSearchField _searchField;
-        [UQuery]
-        private FileLocationPanel _fileLocationPanel;
-        [UQuery]
-        private FileNameField _fileNameField;
+        [Q] private ToolbarSearchField _searchField;
+        [Q] private FileLocationPanel _fileLocationPanel;
+        [Q] private FileNameField _fileNameField;
         #endregion
 
         private string _fileName;
 
-        private void Update() => LastPosition = position;
-
         void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
         {
-            menu.AddItem(new GUIContent("Select"), false, () => {
+            menu.AddItem(new GUIContent("Select"), false, () =>
+            {
                 Debug.Log($"select ");
                 _searchField.Q<TextField>().SelectAll();
             });
 
-            menu.AddItem(new GUIContent("Focus"), false, () => {
+            menu.AddItem(new GUIContent("Focus"), false, () =>
+            {
                 Debug.Log($"Focus ");
                 _searchField.Q<TextField>().Q("unity-text-input").Focus();
             });
@@ -90,22 +84,23 @@ namespace QuickEye.Scaffolding
         private void OnEnable()
         {
             LoadVisualTree();
-            _itemEntries = _controller.GetCreateActions();
+            _itemEntries = _dataSource.GetCreateStrategies();
 
             SetupEntryListView();
             SetupCategoryView();
-            InitSearchField();
+            SetupSearchField();
             SetupFileLocationPanel();
 
             _entryListView.selectedIndex = 0;
-            rootVisualElement.RegisterCallback<AttachToPanelEvent>(evt=>
-            {
-                FocusSearchField();
-
-            });
         }
 
-        private void FocusSearchField() => _searchField.Q<TextField>().Q("unity-text-input").Focus();
+        private void LoadVisualTree()
+        {
+            var visualTree = Resources.Load<VisualTreeAsset>(_uxmlPath);
+
+            visualTree.CloneTree(rootVisualElement);
+            rootVisualElement.AssignQueryResults(this);
+        }
 
         private void SetupFileLocationPanel()
         {
@@ -114,11 +109,7 @@ namespace QuickEye.Scaffolding
             _fileLocationPanel.FileName = _fileName;
             SetDirectory();
 
-            _fileNameField.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.target != _fileNameField) return;
-                _fileName = evt.newValue;
-            });
+            _fileNameField.RegisterThisValueChangedCallback(evt => _fileName = evt.newValue);
         }
 
         private void SetDirectory()
@@ -126,24 +117,16 @@ namespace QuickEye.Scaffolding
             var defaultDirectory = string.Empty;
 
             if (Selection.assetGUIDs.Length > 0)
-                defaultDirectory = AssetDatabase.GUIDToAssetPath(Selection.assetGUIDs[0]);
+                defaultDirectory = Path.GetDirectoryName(AssetDatabase.GUIDToAssetPath(Selection.assetGUIDs[0]));
             else if (FileLocationPanel.PreviousDirectories.Count > 0)
                 defaultDirectory = FileLocationPanel.PreviousDirectories.FirstOrDefault();
 
             _fileLocationPanel.Directory = defaultDirectory;
         }
 
-        private void LoadVisualTree()
-        {
-            var visualTree = Resources.Load<VisualTreeAsset>(_uxmlPath);
-
-            visualTree.CloneTree(rootVisualElement);
-            rootVisualElement.AssignQueryableMembers(this);
-        }
-
         private void SubmitEntry()
         {
-            var entry = _itemEntries[_entryListView.selectedIndex];
+            var entry = _entryListView.selectedItem as CreateAssetStrategy;
             var name = Path.ChangeExtension(_fileLocationPanel.FileName, entry.FileExtension);
             entry.Execute(Path.Combine(_fileLocationPanel.Directory, name));
         }
@@ -151,14 +134,9 @@ namespace QuickEye.Scaffolding
         //Make this a TreeView when its UI Toolkit conterpart becomes public
         private void SetupCategoryView()
         {
-            var categories = _controller.CreateCategories(_itemEntries);
+            var categories = _dataSource.CreateCategories(_itemEntries);
 
-            _categoryListView.makeItem = () =>
-            {
-                var item = new Label();
-                item.AddToClassList("category-item");
-                return item;
-            };
+            _categoryListView.makeItem = () => new Label().WithClass("category-item");
 
             _categoryListView.bindItem = (VisualElement element, int index) =>
             {
@@ -181,14 +159,12 @@ namespace QuickEye.Scaffolding
         {
             var itemPrototype = Resources.Load<VisualTreeAsset>(_listItemUxmlPath);
 
-            _entryListView.makeItem = MakeListItem;
+            _entryListView.makeItem = itemPrototype.CloneTree;
             _entryListView.bindItem = BindListItem;
             _entryListView.onItemsChosen += _ => SubmitEntry();
-            _entryListView.onSelectionChange += items => OnEntrySelected(items.FirstOrDefault() as CreateAssetStrategy);
+            _entryListView.onSelectionChange += s => UpdateView(s.FirstOrDefault() as CreateAssetStrategy);
 
             _entryListView.itemsSource = _itemEntries;
-
-            VisualElement MakeListItem() => itemPrototype.CloneTree();
 
             void BindListItem(VisualElement element, int index)
             {
@@ -196,12 +172,12 @@ namespace QuickEye.Scaffolding
                 element.Q<Label>().text = entry.ItemName;
                 element.Q("icon").style.backgroundImage = entry.Icon;
             }
-        }
 
-        private void OnEntrySelected(CreateAssetStrategy entry)
-        {
-            UpdateDetailsSection(entry);
-            UpdateNameField(entry);
+            void UpdateView(CreateAssetStrategy selectedEntry)
+            {
+                UpdateDetailsSection(selectedEntry);
+                UpdateNameField(selectedEntry);
+            }
         }
 
         private void UpdateNameField(CreateAssetStrategy entry)
@@ -221,24 +197,27 @@ namespace QuickEye.Scaffolding
             _typeName.text = entry?.AssetType?.Name ?? "";
         }
 
-        private void InitSearchField()
+        private void SetupSearchField()
         {
-            _searchField = rootVisualElement.Q<ToolbarSearchField>("search-field");
+            _searchField.RegisterThisValueChangedCallback(FilterEntryList);
 
-            _searchField.RegisterValueChangedCallback(OnSearchUpdate);
+            rootVisualElement.RegisterCallback<AttachToPanelEvent>(_ => FocusSearchField());
 
+            void FocusSearchField() => _searchField.Q<TextField>().Q("unity-text-input").Focus();
 
-            void OnSearchUpdate(ChangeEvent<string> evt)
+            void FilterEntryList(ChangeEvent<string> evt)
             {
                 _categoryListView.selectedIndex = 0;
 
                 if (string.IsNullOrWhiteSpace(evt.newValue))
                     _entryListView.itemsSource = _itemEntries;
                 else
-                    _entryListView.itemsSource =
-                        _itemEntries
-                        .Where(e => e.ItemName.ToLower().Contains(evt.newValue.ToLower()))
-                        .ToList();
+                    _entryListView.itemsSource = _itemEntries
+                      .Where(e => e.ItemName.ToUpperInvariant().Contains(evt.newValue.ToUpperInvariant()))
+                      .ToList();
+
+                if(_entryListView.itemsSource.Count > 0)
+                    _entryListView.selectedIndex = 0;
             }
         }
     }
