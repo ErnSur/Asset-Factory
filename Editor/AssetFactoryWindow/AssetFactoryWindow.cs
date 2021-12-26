@@ -136,7 +136,7 @@ namespace QuickEye.Scaffolding
         {
             var categories = _dataSource.CreateCategories(_itemEntries);
 
-            _categoryListView.makeItem = () => new Label().WithClass("category-item");
+            _categoryListView.makeItem = () => new Label().Class("category-item");
 
             _categoryListView.bindItem = (VisualElement element, int index) =>
             {
@@ -144,7 +144,7 @@ namespace QuickEye.Scaffolding
                 (element as Label).text = category.DisplayName;
             };
 
-            _categoryListView.onSelectionChange += (IEnumerable<object> selectedItems) =>
+            _categoryListView.onSelectionChanged += selectedItems =>
             {
                 var category = selectedItems.FirstOrDefault() as NewItemCategory;
                 _entryListView.itemsSource = _itemEntries.Where(category.Predicate).ToList();
@@ -161,8 +161,8 @@ namespace QuickEye.Scaffolding
 
             _entryListView.makeItem = itemPrototype.CloneTree;
             _entryListView.bindItem = BindListItem;
-            _entryListView.onItemsChosen += _ => SubmitEntry();
-            _entryListView.onSelectionChange += s => UpdateView(s.FirstOrDefault() as CreateAssetStrategy);
+            _entryListView.onItemChosen += _ => SubmitEntry();
+            _entryListView.onSelectionChanged += s => UpdateView(s.FirstOrDefault() as CreateAssetStrategy);
 
             _entryListView.itemsSource = _itemEntries;
 
