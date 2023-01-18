@@ -18,7 +18,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
-    <QuickEye.UIToolkit.FileLocationPanel class="border-color" style="border-top-width: 1px;&#10;">
+    <QuickEye.UIToolkit.Editor.FileLocationPanel class="border-color" style="border-top-width: 1px;&#10;">
         <Style src="AssetFactory.uss" />
-    </QuickEye.UIToolkit.FileLocationPanel>
+    </QuickEye.UIToolkit.Editor.FileLocationPanel>
 </ui:UXML>

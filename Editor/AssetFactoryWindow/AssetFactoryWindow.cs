@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using System.IO;
 using QuickEye.UIToolkit;
+using QuickEye.UIToolkit.Editor;
 #if UNITY_2019_1_OR_NEWER
 using UnityEditor.ShortcutManagement;
 #endif
@@ -144,7 +145,7 @@ namespace QuickEye.Scaffolding
                 (element as Label).text = category.DisplayName;
             };
 
-            _categoryListView.onSelectionChanged += selectedItems =>
+            _categoryListView.onSelectionChange += selectedItems =>
             {
                 var category = selectedItems.FirstOrDefault() as NewItemCategory;
                 _entryListView.itemsSource = _itemEntries.Where(category.Predicate).ToList();
@@ -161,8 +162,8 @@ namespace QuickEye.Scaffolding
 
             _entryListView.makeItem = itemPrototype.CloneTree;
             _entryListView.bindItem = BindListItem;
-            _entryListView.onItemChosen += _ => SubmitEntry();
-            _entryListView.onSelectionChanged += s => UpdateView(s.FirstOrDefault() as CreateAssetStrategy);
+            _entryListView.onItemsChosen += _ => SubmitEntry();
+            _entryListView.onSelectionChange += s => UpdateView(s.FirstOrDefault() as CreateAssetStrategy);
 
             _entryListView.itemsSource = _itemEntries;
 
