@@ -7,21 +7,18 @@ using UnityEditor.UIElements;
 using System.IO;
 using QuickEye.UIToolkit;
 using QuickEye.UIToolkit.Editor;
-#if UNITY_2019_1_OR_NEWER
 using UnityEditor.ShortcutManagement;
-#endif
 
-namespace QuickEye.Scaffolding
+namespace QuickEye.AssetFactory.Editor
 {
     public class AssetFactoryWindow : EditorWindow, IHasCustomMenu
     {
-        public const string ContextMenuPath = "Assets/Create/NewItem...";
+        public const string ContextMenuPath = "Assets/Create/New Item...";
         private const string _uxmlPath = "QuickEye/AssetFactory/AssetFactory";
         private const string _listItemUxmlPath = _uxmlPath + "-item";
 
-#if UNITY_2019_1_OR_NEWER
         [Shortcut(ContextMenuPath, KeyCode.X, ShortcutModifiers.Action | ShortcutModifiers.Shift)]
-#endif
+        [MenuItem(ContextMenuPath, priority = 10)]
         private static void OpenWindow()
         {
             var wnd = GetWindow<AssetFactoryWindow>();
@@ -39,12 +36,13 @@ namespace QuickEye.Scaffolding
             text = "New item...",
             image = EditorGUIUtility.IconContent("Project").image
         };
-        
+
         private AssetFactoryDataSource _dataSource = new AssetFactoryDataSource();
 
         private List<CreateAssetStrategy> _itemEntries;
 
         #region VisualElements
+
         [Q("details")]
         private VisualElement _details;
 
@@ -60,9 +58,15 @@ namespace QuickEye.Scaffolding
         [Q("type-label")]
         private Label _typeName;
 
-        [Q] private ToolbarSearchField _searchField;
-        [Q] private FileLocationPanel _fileLocationPanel;
-        [Q] private FileNameField _fileNameField;
+        [Q]
+        private ToolbarSearchField _searchField;
+
+        [Q]
+        private FileLocationPanel _fileLocationPanel;
+
+        [Q]
+        private FileNameField _fileNameField;
+
         #endregion
 
         private string _fileName;
@@ -214,10 +218,10 @@ namespace QuickEye.Scaffolding
                     _entryListView.itemsSource = _itemEntries;
                 else
                     _entryListView.itemsSource = _itemEntries
-                      .Where(e => e.ItemName.ToUpperInvariant().Contains(evt.newValue.ToUpperInvariant()))
-                      .ToList();
+                        .Where(e => e.ItemName.ToUpperInvariant().Contains(evt.newValue.ToUpperInvariant()))
+                        .ToList();
 
-                if(_entryListView.itemsSource.Count > 0)
+                if (_entryListView.itemsSource.Count > 0)
                     _entryListView.selectedIndex = 0;
             }
         }

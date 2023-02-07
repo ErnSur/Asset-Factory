@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1;">
+        <Style src="project://database/Packages/io.github.ernsur.asset-factory/Editor/Resources/QuickEye/AssetFactory/AssetFactory.uss?fileID=7433441132597879392&amp;guid=11e60f8e407fa6d4aa6a649ea0582929&amp;type=3#AssetFactory" />
+        <uie:Toolbar style="flex-direction: row-reverse;">
+            <uie:ToolbarSearchField focusable="True" name="search-field" style="width: 147px;" />
+        </uie:Toolbar>
+        <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+            <ui:ListView focusable="True" name="category-list" item-height="20" tabindex="-1" class="border-color sidebar" style="width: 125px; border-right-width: 1px;" />
+            <ui:ListView focusable="True" name="entry-list" reorderable="true" style="flex-grow: 1;" />
+            <ui:VisualElement name="right-sidebar" class="sidebar border-color" style="width: 140px; border-left-width: 1px;">
+                <ui:VisualElement name="details">
+                    <ui:VisualElement style="flex-direction: row; margin-bottom: 5px; flex-wrap: wrap;">
+                        <ui:Label text="Type:" style="margin-right: 5px; -unity-font-style: bold;" />
+                        <ui:Label name="type-label" style="white-space: normal;" />
+                    </ui:VisualElement>
+                    <ui:Label text="description.." name="description" style="white-space: normal;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <QuickEye.UIToolkit.Editor.FileLocationPanel class="border-color" style="border-top-width: 1px; min-height: 50px;">
+        <Style src="project://database/Packages/io.github.ernsur.asset-factory/Editor/Resources/QuickEye/AssetFactory/AssetFactory.uss?fileID=7433441132597879392&amp;guid=11e60f8e407fa6d4aa6a649ea0582929&amp;type=3#AssetFactory" />
+    </QuickEye.UIToolkit.Editor.FileLocationPanel>
+</ui:UXML>

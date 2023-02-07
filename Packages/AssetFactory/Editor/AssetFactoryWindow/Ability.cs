@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace QuickEye.Scaffolding
+namespace QuickEye.AssetFactory.Editor
 {
     //Example
     public class Ability : ScriptableObject

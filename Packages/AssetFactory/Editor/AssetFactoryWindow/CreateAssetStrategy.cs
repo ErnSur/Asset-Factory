@@ -6,7 +6,7 @@ using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace QuickEye.Scaffolding
+namespace QuickEye.AssetFactory.Editor
 {
     //Strategy for asset creation
     // descryption andect in attribute? no because StrategyFactory need to provide this too?

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QuickEye.Scaffolding
+namespace QuickEye.AssetFactory.Editor
 {
     //AddNewItemEntry
     //Should be outside Editor assembly

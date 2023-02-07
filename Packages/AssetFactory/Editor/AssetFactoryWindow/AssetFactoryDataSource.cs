@@ -10,16 +10,8 @@ using System.Text;
 using UnityEditor.ShortcutManagement;
 #endif
 
-namespace QuickEye.Scaffolding
+namespace QuickEye.AssetFactory.Editor
 {
-    public class NewItemEntryProvider
-    {
-        //public static CreateAssetStrategy[] Get()
-        //{
-
-        //}
-    }
-
     public class AssetFactoryDataSource
     {
         private const string _createMenuPath = "Assets/Create/";
@@ -27,29 +19,19 @@ namespace QuickEye.Scaffolding
 
         public List<CreateAssetStrategy> GetCreateStrategies()
         {
-            var shortcuts = TypeCache.GetMethodsWithAttribute<ShortcutAttribute>();
             var menuItems = TypeCache.GetMethodsWithAttribute<MenuItem>();
             var scriptableObjects = TypeCache.GetTypesWithAttribute<CreateAssetMenuAttribute>();
             var entriesMethods = TypeCache.GetMethodsWithAttribute<CreateAssetEntryAttribute>();
 
-            //var menuItemEntries =
-            //    from method in menuItems
-            //    let att = GetAttribute<MenuItem>(method)
-            //    where !att.validate
-            //    let menuPath = att.menuItem
-            //    where menuPath.StartsWith(_createMenuPath)
-            //    where menuPath != NewItemWindowPath
-            //    select new CreateAssetStrategy(null, menuPath.Substring(_createMenuPath.Length),
-            //    _ => EditorApplication.ExecuteMenuItem(menuPath));
-
-            //var shortcutEntries =
-            //    from method in shortcuts
-            //    let att = GetAttribute<ShortcutAttribute>(method)
-            //    let menuPath = att.displayName
-            //    where menuPath.StartsWith(_createMenuPath)
-            //    where menuPath != NewItemWindowPath
-            //    select new CreateAssetStrategy(null, menuPath.Substring(_createMenuPath.Length),
-            //    _ => EditorApplication.ExecuteMenuItem(menuPath));
+            // var menuItemEntries =
+            //     from method in menuItems
+            //     let att = GetAttribute<MenuItem>(method)
+            //     where !att.validate
+            //     let menuPath = att.menuItem
+            //     where menuPath.StartsWith(_createMenuPath)
+            //     where menuPath != NewItemWindowPath
+            //     select new CreateAssetStrategy(null, menuPath.Substring(_createMenuPath.Length),
+            //     _ => EditorApplication.ExecuteMenuItem(menuPath));
 
             var soEntries =
                 from so in scriptableObjects
@@ -61,8 +43,7 @@ namespace QuickEye.Scaffolding
                 select method.Invoke(null, null) as CreateAssetStrategy;
 
             var allEntries =
-                // menuItemEntries
-                //.Concat(shortcutEntries)
+                // menuItemEntries.Concat(soEntries)
                 soEntries
                 .Concat(concredeEntries)
                 .ToList();
@@ -77,7 +58,7 @@ namespace QuickEye.Scaffolding
 
             CreateAssetStrategy CreateItemEntryFromSO(Type type, CreateAssetMenuAttribute att)
             {
-                var entry = new CreateScriptableObjectStarategy(type, att.menuName);
+                var entry = new CreateScriptableObjectStrategy(type, att.menuName);
                 if (!string.IsNullOrWhiteSpace(att.fileName))
                     entry.DefaultFileName = att.fileName;
                 return entry;
@@ -122,7 +103,7 @@ namespace QuickEye.Scaffolding
                 if (!Path.HasExtension(fileName))
                     fileName = fileName + ".asset";
 
-                var item = new CreateScriptableObjectStarategy(type, menuItemName)
+                var item = new CreateScriptableObjectStrategy(type, menuItemName)
                 { DefaultFileName = fileName };
                 result.Add(item);
             }

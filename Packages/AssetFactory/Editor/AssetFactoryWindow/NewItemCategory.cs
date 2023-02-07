@@ -1,8 +1,6 @@
 ﻿using System;
-#if UNITY_2019_1_OR_NEWER
-#endif
 
-namespace QuickEye.Scaffolding
+namespace QuickEye.AssetFactory.Editor
 {
     public class NewItemCategory
     {

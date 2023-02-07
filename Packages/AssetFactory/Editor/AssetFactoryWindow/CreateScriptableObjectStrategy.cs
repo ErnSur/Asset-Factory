@@ -2,19 +2,19 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace QuickEye.Scaffolding
+namespace QuickEye.AssetFactory.Editor
 {
-    public class CreateScriptableObjectStrategy<T> : CreateScriptableObjectStarategy where T : ScriptableObject
+    public class CreateScriptableObjectStrategy<T> : CreateScriptableObjectStrategy where T : ScriptableObject
     {
         public CreateScriptableObjectStrategy() : base(typeof(T)) { }
         public CreateScriptableObjectStrategy(string menuPath) : base(typeof(T), menuPath) { }
     }
 
-    public class CreateScriptableObjectStarategy : CreateAssetStrategy
+    public class CreateScriptableObjectStrategy : CreateAssetStrategy
     {
-        public CreateScriptableObjectStarategy(Type type) : this(type, ObjectNames.NicifyVariableName(type.Name)) { }
+        public CreateScriptableObjectStrategy(Type type) : this(type, ObjectNames.NicifyVariableName(type.Name)) { }
 
-        public CreateScriptableObjectStarategy(Type type, string menuPath) : base(type,FallbackTypeNamePath(type, menuPath))
+        public CreateScriptableObjectStrategy(Type type, string menuPath) : base(type,FallbackTypeNamePath(type, menuPath))
         {
             FileExtension = ".asset";
             Icon = GetIcon(type);

@@ -1,8 +1,9 @@
 {
-    "name": "QuickEye.AssetFactory",
+    "name": "QuickEye.AssetFactory.Editor",
+    "rootNamespace": "",
     "references": [
-        "QuickEye.UIToolkit",
-        "QuickEye.UIToolkit.Editor"
+        "GUID:9861c8596b4de1544a09a56d39ef2572",
+        "GUID:6ab25394d0074b745876cdc311fa86c1"
     ],
     "includePlatforms": [
         "Editor"
